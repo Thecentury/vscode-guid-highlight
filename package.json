@@ -2,6 +2,7 @@
   "name": "guid-highlight",
   "displayName": "GUID highlight",
   "description": "Highlights GUIDs in your files",
+  "publisher": "thecentury",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.86.0"
@@ -9,8 +10,13 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": ["*"],
   "main": "./dist/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    }
+  },
   "contributes": {
     "commands": [
       {
