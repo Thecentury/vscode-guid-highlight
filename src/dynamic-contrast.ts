@@ -9,12 +9,15 @@
 //                         rgba(255, 255, 255, 1)
 //                         blue, green, red
 // @return      string of the form #RRGGBB
-export function getColorContrast(color : string) {
-  const rgbExp = /^rgba?[\s+]?\(\s*([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\s*,\s*([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\s*,\s*([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\s*(?:,\s*([\d.]+)\s*)?\)/im,
-    hexExp = /^(?:#)|([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/igm;
+export function getColorContrast(color: string) {
+  const rgbExp =
+      /^rgba?[\s+]?\(\s*([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\s*,\s*([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\s*,\s*([01]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])\s*(?:,\s*([\d.]+)\s*)?\)/im,
+    hexExp = /^(?:#)|([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$/gim;
   let rgb = color.match(rgbExp),
     hex = color.match(hexExp),
-    r, g, b,
+    r,
+    g,
+    b,
     hexColor;
   if (rgb) {
     r = parseInt(rgb[1], 10);
@@ -22,18 +25,18 @@ export function getColorContrast(color : string) {
     b = parseInt(rgb[3], 10);
   } else if (hex) {
     if (hex.length > 1) {
-        hexColor = hex[1];
+      hexColor = hex[1];
     } else {
-        hexColor = hex[0];
+      hexColor = hex[0];
     }
     if (hexColor.length == 3) {
-        hexColor = hexColor[0] + hexColor[0] + hexColor[1] + hexColor[1] + hexColor[2] + hexColor[2];
+      hexColor = hexColor[0] + hexColor[0] + hexColor[1] + hexColor[1] + hexColor[2] + hexColor[2];
     }
     r = parseInt(hexColor.substr(0, 2), 16);
     g = parseInt(hexColor.substr(2, 2), 16);
     b = parseInt(hexColor.substr(4, 2), 16);
   } else {
-      return '#000000';
+    return "#000000";
   }
   // The color with the maximum contrast ratio to our input color is guaranteed
   // to either be white or black, so we just check both and pick whichever has
@@ -49,9 +52,9 @@ export function getColorContrast(color : string) {
   let contrastWhite = contrastRatio(luminance, luminanceWhite);
   let contrastBlack = contrastRatio(luminance, luminanceBlack);
   if (contrastWhite > contrastBlack) {
-    return '#FFFFFF';
+    return "#FFFFFF";
   } else {
-    return '#000000';
+    return "#000000";
   }
 }
 
@@ -75,7 +78,7 @@ export function getColorContrast(color : string) {
  *                   inputs were in the correct range, this will be a number
  *                   between 1.0 and 21.0 (inclusive).
  */
-function contrastRatio(l1 : number, l2 : number) : number {
+function contrastRatio(l1: number, l2: number): number {
   // Note: the denominator of the contrast ratio must be the darker (e.g. lower
   // relative luminance) color.
   if (l2 < l1) {
@@ -106,7 +109,7 @@ function contrastRatio(l1 : number, l2 : number) : number {
  * @returns  number  The relative luminance of the color, a number between 0.0
  *                   and 1.0 (inclusive).
  */
-function relativeLuminance(r8 : number, g8 : number, b8 : number) : number {
+function relativeLuminance(r8: number, g8: number, b8: number): number {
   const bigR = srgb8ToLinear(r8);
   const bigG = srgb8ToLinear(g8);
   const bigB = srgb8ToLinear(b8);
@@ -127,22 +130,20 @@ function relativeLuminance(r8 : number, g8 : number, b8 : number) : number {
  * @returns  number  The value of the channel in a linear RGB color space -- a
  *                   number between 0.0 and 1.0, inclusive.
  */
-const srgb8ToLinear = (function() {
+const srgb8ToLinear = (function () {
   // There are only 256 possible different input values (0 <= input <= 255),
   // so we just use a lookup table, which to avoid repeating the (somewhat
   // costly) computation 3 times for each input.
   const srgbLookupTable = new Float64Array(256);
   for (let i = 0; i < 256; ++i) {
     const c = i / 255.0;
-    srgbLookupTable[i] = (c <= 0.04045)
-      ? c / 12.92
-      : Math.pow((c + 0.055) / 1.055, 2.4);
+    srgbLookupTable[i] = c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
   }
 
-  return function srgb8ToLinear(c8 : number) : number {
+  return function srgb8ToLinear(c8: number): number {
     // Input should be an integer between 0 and 255 already, but clamp if
     // for some reason it is not.
     const index = Math.min(Math.max(c8, 0), 255) & 0xff;
     return srgbLookupTable[index];
   };
-}());
+})();

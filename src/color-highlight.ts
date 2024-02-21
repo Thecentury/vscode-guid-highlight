@@ -69,16 +69,11 @@ export class DocumentHighlight {
     //   }
 
     this.decorations = new DecorationMap(viewConfig);
-    this.listener = workspace.onDidChangeTextDocument(({ document }) =>
-      this.onUpdate(document)
-    );
+    this.listener = workspace.onDidChangeTextDocument(({ document }) => this.onUpdate(document));
   }
 
   onUpdate(document: TextDocument = this.document) {
-    if (
-      this.disposed ||
-      this.document.uri.toString() !== document.uri.toString()
-    ) {
+    if (this.disposed || this.document.uri.toString() !== document.uri.toString()) {
       return;
     }
 
@@ -103,8 +98,7 @@ export class DocumentHighlight {
       const actualVersion = this.document.version.toString();
       if (actualVersion !== version) {
         // todo update env
-        if (process.env.COLOR_HIGHLIGHT_DEBUG)
-          throw new Error("Document version already has changed");
+        if (process.env.COLOR_HIGHLIGHT_DEBUG) throw new Error("Document version already has changed");
 
         return;
       }
@@ -115,21 +109,16 @@ export class DocumentHighlight {
         return false;
       }
 
-      const updateStack = this.decorations
-        .keys()
-        .reduce((state: Map<string, Range[]>, color: string) => {
-          state.set(color, []);
-          return state;
-        }, new Map());
+      const updateStack = this.decorations.keys().reduce((state: Map<string, Range[]>, color: string) => {
+        state.set(color, []);
+        return state;
+      }, new Map());
 
       for (let [color, ranges] of colorRanges) {
         updateStack.set(
           color,
           ranges.map((item: HighlightedRange) => {
-            return new Range(
-              this.document.positionAt(item.start),
-              this.document.positionAt(item.end)
-            );
+            return new Range(this.document.positionAt(item.start), this.document.positionAt(item.end));
           })
         );
       }
@@ -158,23 +147,18 @@ export class DocumentHighlight {
   }
 }
 
-function groupByColor(
-  results: HighlightedRange[]
-): Map<string, HighlightedRange[]> {
-  return results.reduce(
-    (collection: Map<string, HighlightedRange[]>, item: HighlightedRange) => {
-      let list = collection.get(item.color);
-      if (!list) {
-        list = [];
-        collection.set(item.color, list);
-      }
+function groupByColor(results: HighlightedRange[]): Map<string, HighlightedRange[]> {
+  return results.reduce((collection: Map<string, HighlightedRange[]>, item: HighlightedRange) => {
+    let list = collection.get(item.color);
+    if (!list) {
+      list = [];
+      collection.set(item.color, list);
+    }
 
-      list.push(item);
+    list.push(item);
 
-      return collection;
-    },
-    new Map()
-  );
+    return collection;
+  }, new Map());
 }
 
 function concatAll(arr: any[]) {
