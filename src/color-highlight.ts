@@ -32,14 +32,12 @@ export class DocumentHighlight {
     return this.updateRange(text, version);
   }
 
-  /**
-   * @param {string} text
-   * @param {string} version
-   *
-   * @memberOf DocumentHighlight
-   */
   async updateRange(text: string, version: string) {
     try {
+      if (this.disposed) {
+        return false;
+      }
+
       const result = await Promise.all(this.strategies.map((fn) => fn(text)));
 
       const actualVersion = this.document.version.toString();
