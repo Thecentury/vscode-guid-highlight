@@ -3,6 +3,12 @@
   "displayName": "GUID highlight",
   "description": "Highlights GUIDs in your files",
   "publisher": "thecentury",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Thecentury/vscode-guid-highlight.git"
+  },
+  "homepage": "https://github.com/Thecentury/vscode-guid-highlight",
+  "icon": "images/logo.png",
   "version": "1.0.0",
   "engines": {
     "vscode": "^1.86.0"
