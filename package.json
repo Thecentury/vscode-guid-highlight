@@ -26,12 +26,6 @@
     }
   },
   "contributes": {
-    "commands": [
-      {
-        "command": "guid-highlight.helloWorld",
-        "title": "Hello World"
-      }
-    ],
     "configuration": {
       "title": "GUID highlight",
       "properties": {

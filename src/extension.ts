@@ -15,18 +15,6 @@ let config: GuidHighlightConfig;
 export function activate(context: vscode.ExtensionContext) {
   reactivate();
 
-  // todo use or remove
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand("guid-highlight.helloWorld", () => {
-    // The code you place here will be executed every time your command is executed
-    // Display a message box to the user
-    vscode.window.showInformationMessage("Hello World from GUID highlight!");
-  });
-
-  context.subscriptions.push(disposable);
-
   vscode.workspace.onDidChangeConfiguration(onConfigurationChange, null, context.subscriptions);
   vscode.window.onDidChangeVisibleTextEditors(onOpenEditor, null, context.subscriptions);
 }
