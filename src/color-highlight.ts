@@ -44,8 +44,9 @@ export class DocumentHighlight {
 
       const actualVersion = this.document.version.toString();
       if (actualVersion !== version) {
-        // todo update env
-        if (process.env.COLOR_HIGHLIGHT_DEBUG) throw new Error("Document version already has changed");
+        if (process.env.GUID_HIGHLIGHT_DEBUG) {
+          throw new Error("Document version already has changed");
+        }
 
         return;
       }
@@ -86,11 +87,6 @@ export class DocumentHighlight {
     this.disposed = true;
     this.decorations.dispose();
     this.listener.dispose();
-
-    //   this.decorations = null;
-    //   this.document = null;
-    //   this.colors = null;
-    //   this.listener = null;
   }
 }
 
