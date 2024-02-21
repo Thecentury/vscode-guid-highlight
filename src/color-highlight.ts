@@ -70,11 +70,11 @@ export class DocumentHighlight {
         );
       }
 
+      const documentEditors = window.visibleTextEditors.filter(({ document }) => document.uri === this.document.uri);
       for (let [color, updates] of updateStack) {
         const decoration = this.decorations.get(color);
 
-        window.visibleTextEditors
-          .filter(({ document }) => document.uri === this.document.uri)
+        documentEditors
           .forEach((editor) => editor.setDecorations(decoration, updates));
       }
     } catch (error) {
