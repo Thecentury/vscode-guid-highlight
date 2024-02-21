@@ -1,12 +1,13 @@
 "use strict";
 import * as vscode from "vscode";
 import { getColorContrast } from "./dynamic-contrast";
+import { HighlightMarkerType } from "./config";
 
 export class DecorationOptions {
   markRuler: boolean;
-  markerType: string;
+  markerType: HighlightMarkerType;
 
-  constructor(markRuler: boolean, markerType: string) {
+  constructor(markRuler: boolean, markerType: HighlightMarkerType) {
     this.markRuler = markRuler;
     this.markerType = markerType;
   }
@@ -35,19 +36,16 @@ export class DecorationMap {
       }
 
       switch (this.options.markerType) {
-        case "outline":
+        case HighlightMarkerType.Outline:
           rules.border = `3px solid ${color}`;
           break;
-        case "foreground":
+        case HighlightMarkerType.Foreground:
           rules.color = color;
           break;
-        case "underline":
+        case HighlightMarkerType.Underline:
           rules.color = "invalid; border-bottom:solid 2px " + color;
           break;
-        case "dot":
-        case "dotafter":
-        case "dot-after":
-        case "dot_after":
+        case HighlightMarkerType.DotAfter:
           rules.after = {
             contentText: " ",
             margin: "0.1em 0.2em 0 0.2em",
@@ -57,9 +55,7 @@ export class DecorationMap {
             // borderRadius: '50%'
           };
           break;
-        case "dotbefore":
-        case "dot-before":
-        case "dot_before":
+        case HighlightMarkerType.DotBefore:
           rules.before = {
             contentText: " ",
             margin: "0.1em 0.2em 0 0.2em",
@@ -69,7 +65,7 @@ export class DecorationMap {
             // borderRadius: '50%'
           };
           break;
-        case "background":
+        case HighlightMarkerType.Background:
         default:
           rules.backgroundColor = color;
           rules.color = getColorContrast(color);

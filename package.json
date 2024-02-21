@@ -3,14 +3,16 @@
   "displayName": "GUID highlight",
   "description": "Highlights GUIDs in your files",
   "publisher": "thecentury",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.86.0"
   },
   "categories": [
     "Other"
   ],
-  "activationEvents": ["*"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "capabilities": {
     "untrustedWorkspaces": {
@@ -23,7 +25,42 @@
         "command": "guid-highlight.helloWorld",
         "title": "Hello World"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "GUID highlight",
+      "properties": {
+        "guid-highlight.enable": {
+          "default": true,
+          "description": "Controls if the plugin is enabled",
+          "type": "boolean"
+        },
+        "guid-highlight.languages": {
+          "default": [
+            "*"
+          ],
+          "description": "An array of language ids which should be highlighted by GUID highlight. \"*\" to trigger on any language. Prepend language id with \"!\" to exclude the language (i.e., \"!typescript\", \"!javascript\").",
+          "type": "array"
+        },
+        "guid-highlight.markerType": {
+          "default": "background",
+          "description": "Style of the highlight. Can be 'dot-before', 'dot-after', 'foreground', 'background', 'outline', 'underline'",
+          "type": "string",
+          "enum": [
+            "dot-before",
+            "dot-after",
+            "foreground",
+            "background",
+            "outline",
+            "underline"
+          ]
+        },
+        "guid-highlight.markRuler": {
+          "default": true,
+          "description": "Highlight GUIDs on the ruler (scroll bar)",
+          "type": "boolean"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

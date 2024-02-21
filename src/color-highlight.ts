@@ -13,61 +13,8 @@ export class DocumentHighlight {
 
   constructor(document: TextDocument, viewConfig: DecorationOptions) {
     this.disposed = false;
-
     this.document = document;
-    // todo initialize strategies
     this.strategies = [dotnetGuids];
-    //   this.strategies = [findFn, findHwb];
-
-    //   if (viewConfig.useARGB == true) {
-    //     this.strategies.push(findHexARGB);
-    //   } else {
-    //     this.strategies.push(findHexRGBA);
-    //   }
-
-    //   if (colorWordsLanguages.indexOf(document.languageId) > -1 || viewConfig.matchWords) {
-    //     this.strategies.push(findWords);
-    //   }
-
-    //   if (viewConfig.matchRgbWithNoFunction) {
-    //     let isValid = false;
-
-    //     if (viewConfig.rgbWithNoFunctionLanguages.indexOf('*') > -1) {
-    //       isValid = true;
-    //     }
-
-    //     if (viewConfig.rgbWithNoFunctionLanguages.indexOf(document.languageId) > -1) {
-    //       isValid = true;
-    //     }
-
-    //     if (viewConfig.rgbWithNoFunctionLanguages.indexOf(`!${document.languageId}`) > -1) {
-    //       isValid = false;
-    //     }
-
-    //     if (isValid) this.strategies.push(findRgbNoFn);
-    //   }
-
-    //   switch (document.languageId) {
-    //     case 'css':
-    //       this.strategies.push(findCssVars);
-    //       break;
-    //     case 'less':
-    //       this.strategies.push(findLessVars);
-    //       break;
-    //     case 'stylus':
-    //       this.strategies.push(findStylVars);
-    //       break;
-    //     case 'sass':
-    //     case 'scss':
-    //       this.strategies.push(text => findScssVars(text, {
-    //         data: text,
-    //         cwd: dirname(document.uri.fsPath),
-    //         extensions: ['.scss', '.sass'],
-    //         includePaths: viewConfig.sass.includePaths || []
-    //       }));
-    //       break;
-    //   }
-
     this.decorations = new DecorationMap(viewConfig);
     this.listener = workspace.onDidChangeTextDocument(({ document }) => this.onUpdate(document));
   }

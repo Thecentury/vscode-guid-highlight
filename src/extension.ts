@@ -3,20 +3,19 @@
 import * as vscode from "vscode";
 import { DocumentHighlight } from "./color-highlight";
 import { DecorationOptions } from "./decoration-map";
+import { GuidHighlightConfig } from "./config";
+
+const settingsSection: string = "guid-highlight";
 
 let instanceMap: DocumentHighlight[] = [];
-let config: vscode.WorkspaceConfiguration;
+let config: GuidHighlightConfig;
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  instanceMap = [];
-  config = vscode.workspace.getConfiguration("guid-highlight");
+  reactivate();
 
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "guid-highlight" is now active!');
-
+  // todo use or remove
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
@@ -28,8 +27,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(disposable);
 
+  vscode.workspace.onDidChangeConfiguration(onConfigurationChange, null, context.subscriptions);
   vscode.window.onDidChangeVisibleTextEditors(onOpenEditor, null, context.subscriptions);
-  onOpenEditor(vscode.window.visibleTextEditors);
 }
 
 // This method is called when your extension is deactivated
@@ -40,6 +39,8 @@ export function deactivate() {
 
 function reactivate() {
   deactivate();
+
+  config = vscode.workspace.getConfiguration().get<GuidHighlightConfig>(settingsSection)!;
 
   instanceMap = [];
   onOpenEditor(vscode.window.visibleTextEditors);
@@ -70,14 +71,8 @@ async function doHighlight(documents: vscode.TextDocument[] = []) {
 
 /**
  *  Checks if the document is applicable for autoHighlighighting
- *
- * @param {{languages: string[]}} config
- * @param {vscode.TextDocument} document
- * @returns
  */
-function isValidDocument(config: any, document: vscode.TextDocument) {
-  // todo
-  return true;
+function isValidDocument(config: GuidHighlightConfig, document: vscode.TextDocument) {
   let isValid = false;
 
   if (!config.enable) {
@@ -100,9 +95,6 @@ function isValidDocument(config: any, document: vscode.TextDocument) {
 
 /**
  * Finds relevant instance of the DocumentHighlighter or creates a new one
- *
- * @param {vscode.TextDocument} document
- * @returns {DocumentHighlight}
  */
 async function findOrCreateInstance(document: vscode.TextDocument): Promise<DocumentHighlight | null> {
   if (!document) {
@@ -112,15 +104,16 @@ async function findOrCreateInstance(document: vscode.TextDocument): Promise<Docu
   const found = instanceMap.find(({ document: refDoc }) => refDoc === document);
 
   if (!found) {
-    let docConfig = new DecorationOptions(
-      false,
-      "background"
-      // config.get("markRuler")!,
-      // config.get("markerType")!
-    );
+    let docConfig = new DecorationOptions(config.markRuler, config.markerType);
     const instance = new DocumentHighlight(document, docConfig);
     instanceMap.push(instance);
   }
 
   return found || instanceMap[instanceMap.length - 1];
+}
+
+function onConfigurationChange(e: vscode.ConfigurationChangeEvent) {
+  if (e.affectsConfiguration(settingsSection)) {
+    reactivate();
+  }
 }
