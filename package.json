@@ -9,7 +9,7 @@
   },
   "homepage": "https://github.com/Thecentury/vscode-guid-highlight",
   "icon": "images/logo.png",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "engines": {
     "vscode": "^1.86.0"
   },
