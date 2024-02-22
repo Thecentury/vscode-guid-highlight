@@ -26,6 +26,12 @@
     }
   },
   "contributes": {
+    "commands": [
+      {
+        "command": "guid-highlight.reactivate",
+        "title": "GUID highlight: Restart"
+      }
+    ],
     "configuration": {
       "title": "GUID highlight",
       "properties": {
@@ -58,6 +64,13 @@
           "default": true,
           "description": "Highlight GUIDs on the ruler (scroll bar)",
           "type": "boolean"
+        },
+        "guid-highlight.patterns": {
+          "default": [
+            "\\b[\\dA-F]{8}-[\\dA-F]{4}-[\\dA-F]{4}-[\\dA-F]{4}-[\\dA-F]{12}\\b"
+          ],
+          "description": "An array of regular expressions to match GUIDs or other identifiers",
+          "type": "array"
         }
       }
     }

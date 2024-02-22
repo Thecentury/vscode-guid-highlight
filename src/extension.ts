@@ -15,8 +15,25 @@ let config: GuidHighlightConfig;
 export function activate(context: vscode.ExtensionContext) {
   reactivate();
 
+  context.subscriptions.push(
+    vscode.commands.registerCommand("guid-highlight.reactivate", () => {
+      reactivate();
+    })
+  );
   vscode.workspace.onDidChangeConfiguration(onConfigurationChange, null, context.subscriptions);
   vscode.window.onDidChangeVisibleTextEditors(onOpenEditor, null, context.subscriptions);
+  // vscode.workspace.onDidOpenTextDocument((document) => {
+  //   console.log(`workspace.onDidOpenTextDocument: ${document.fileName}`);
+  //   // if (isValidDocument(config, document)) {
+  //   //   doHighlight([document]);
+  //   // }
+  // }, null, context.subscriptions);
+  // vscode.window.onDidChangeActiveTextEditor((editor) => {
+  //   console.log(`window.onDidChangeActiveTextEditor: ${editor?.document.fileName}. Active editor: ${vscode.window.activeTextEditor?.document.fileName}`);
+  // }, null, context.subscriptions);
+  // vscode.window.onDidChangeVisibleNotebookEditors((editors) => {
+  //   console.log(`window.onDidChangeVisibleNotebookEditors: ${editors.map((editor) => editor.notebook.uri).join(", ")}`);
+  // }, null, context.subscriptions);
 }
 
 // This method is called when your extension is deactivated
@@ -30,7 +47,6 @@ function reactivate() {
 
   config = vscode.workspace.getConfiguration().get<GuidHighlightConfig>(settingsSection)!;
 
-  instanceMap = [];
   onOpenEditor(vscode.window.visibleTextEditors);
 }
 
@@ -43,14 +59,13 @@ function onOpenEditor(editors: readonly vscode.TextEditor[]) {
   instanceMap = instanceMap.filter(({ document }) => documents.indexOf(document) > -1);
   forDisposal.forEach((instance) => instance.dispose());
 
-  // enable highlight in active editors
-  const validDocuments = documents.filter((doc) => isValidDocument(config, doc));
-
-  doHighlight(validDocuments);
+  const applicableDocuments = documents.filter((doc) => isValidDocument(config, doc));
+  doHighlight(applicableDocuments);
 }
 
 async function doHighlight(documents: vscode.TextDocument[] = []) {
   if (documents.length) {
+    console.log(`Highlighting documents: ${documents.map((doc) => doc.fileName).join(", ")}`);
     const instances = await Promise.all(documents.map(findOrCreateInstance));
 
     return instances.filter((instance) => instance !== null).map((instance) => instance!.onUpdate());
@@ -58,7 +73,7 @@ async function doHighlight(documents: vscode.TextDocument[] = []) {
 }
 
 /**
- *  Checks if the document is applicable for autoHighlighighting
+ *  Checks if the document is applicable for highlighting
  */
 function isValidDocument(config: GuidHighlightConfig, document: vscode.TextDocument) {
   let isValid = false;
@@ -92,8 +107,8 @@ async function findOrCreateInstance(document: vscode.TextDocument): Promise<Docu
   const found = instanceMap.find(({ document: refDoc }) => refDoc === document);
 
   if (!found) {
-    let docConfig = new DecorationOptions(config.markRuler, config.markerType);
-    const instance = new DocumentHighlight(document, docConfig);
+    let decorations = new DecorationOptions(config.markRuler, config.markerType);
+    const instance = new DocumentHighlight(document, decorations, config.patterns);
     instanceMap.push(instance);
   }
 
@@ -102,6 +117,7 @@ async function findOrCreateInstance(document: vscode.TextDocument): Promise<Docu
 
 function onConfigurationChange(e: vscode.ConfigurationChangeEvent) {
   if (e.affectsConfiguration(settingsSection)) {
+    console.log("Configuration changed, reactivating...");
     reactivate();
   }
 }

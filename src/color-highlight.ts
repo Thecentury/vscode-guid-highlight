@@ -2,19 +2,29 @@ import { workspace, window, Range, TextDocument, Disposable } from "vscode";
 
 import { DecorationMap, DecorationOptions } from "./decoration-map";
 import { HighlightedRange } from "./strategies/strategy-types";
-import { dotnetGuids } from "./strategies/dotnet-guid";
+import { pattern } from "./strategies/pattern";
+
+function isValidRegex(pattern: string): boolean {
+  try {
+    new RegExp(pattern, "dgi");
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
 
 export class DocumentHighlight {
   disposed: boolean;
   document: TextDocument;
-  strategies: ((text: string) => Promise<HighlightedRange[]>)[];
   decorations: DecorationMap;
   listener: Disposable;
+  patterns: string[];
 
-  constructor(document: TextDocument, viewConfig: DecorationOptions) {
+  constructor(document: TextDocument, viewConfig: DecorationOptions, patterns: string[]) {
     this.disposed = false;
     this.document = document;
-    this.strategies = [dotnetGuids];
+    // todo log invalid patterns
+    this.patterns = patterns.filter((pattern) => pattern.length > 0 && !pattern.startsWith("# ") && isValidRegex(pattern));
     this.decorations = new DecorationMap(viewConfig);
     this.listener = workspace.onDidChangeTextDocument(({ document }) => this.onUpdate(document));
   }
@@ -38,7 +48,7 @@ export class DocumentHighlight {
         return false;
       }
 
-      const result = await Promise.all(this.strategies.map((fn) => fn(text)));
+      const result = await Promise.all(this.patterns.map(regex => pattern(regex, text)));
 
       const actualVersion = this.document.version.toString();
       if (actualVersion !== version) {

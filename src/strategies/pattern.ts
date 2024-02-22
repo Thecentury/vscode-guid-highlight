@@ -12,11 +12,11 @@ function guidToColor(guid: string): string {
   return color;
 }
 
-export async function dotnetGuids(text: string): Promise<HighlightedRange[]> {
+export async function pattern(pattern: string, text: string): Promise<HighlightedRange[]> {
   // d — enable regex indices
   // g — global search
   // i — ignore case
-  const guidRegex = /\b[\dA-F]{8}-[\dA-F]{4}-[\dA-F]{4}-[\dA-F]{4}-[\dA-F]{12}\b/dgi;
+  const guidRegex: RegExp = new RegExp(pattern, "dgi");
   const ranges: HighlightedRange[] = [];
   while (true) {
     const matches = guidRegex.exec(text);

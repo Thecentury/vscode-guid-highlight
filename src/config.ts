@@ -12,4 +12,5 @@ export interface GuidHighlightConfig {
     languages: string[];
     markerType: HighlightMarkerType;
     markRuler: boolean;
+    patterns: string[];
 }
