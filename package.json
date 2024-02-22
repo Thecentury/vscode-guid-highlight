@@ -71,6 +71,11 @@
           ],
           "description": "An array of regular expressions to match GUIDs or other identifiers",
           "type": "array"
+        },
+        "guid-highlight.maxFileSize": {
+          "default": 20000000,
+          "description": "Maximum file size in bytes to highlight",
+          "type": "number"
         }
       }
     }

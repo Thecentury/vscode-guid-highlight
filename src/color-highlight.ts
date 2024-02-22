@@ -3,6 +3,7 @@ import { workspace, window, Range, TextDocument, Disposable } from "vscode";
 import { DecorationMap, DecorationOptions } from "./decoration-map";
 import { HighlightedRange } from "./strategies/strategy-types";
 import { pattern } from "./strategies/pattern";
+import { GuidHighlightConfig } from "./config";
 
 function isValidRegex(pattern: string): boolean {
   try {
@@ -19,12 +20,14 @@ export class DocumentHighlight {
   decorations: DecorationMap;
   listener: Disposable;
   patterns: string[];
+  config: GuidHighlightConfig;
 
-  constructor(document: TextDocument, viewConfig: DecorationOptions, patterns: string[]) {
+  constructor(document: TextDocument, viewConfig: DecorationOptions, config: GuidHighlightConfig) {
     this.disposed = false;
     this.document = document;
+    this.config = config;
     // todo log invalid patterns
-    this.patterns = patterns.filter((pattern) => pattern.length > 0 && !pattern.startsWith("# ") && isValidRegex(pattern));
+    this.patterns = config.patterns.filter((pattern) => pattern.length > 0 && !pattern.startsWith("# ") && isValidRegex(pattern));
     this.decorations = new DecorationMap(viewConfig);
     this.listener = workspace.onDidChangeTextDocument(({ document }) => this.onUpdate(document));
   }
@@ -35,6 +38,10 @@ export class DocumentHighlight {
     }
 
     const text = this.document.getText();
+    if(this.config.maxFileSize > 0 && text.length > this.config.maxFileSize) {
+      console.log(`DocumentHighlight.onUpdate: ${document.fileName} is too large (${text.length}) to highlight`);
+      return;
+    }
     const version = this.document.version.toString();
 
     console.log(`DocumentHighlight.onUpdate: ${document.fileName} v${version}`);

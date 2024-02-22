@@ -13,4 +13,5 @@ export interface GuidHighlightConfig {
     markerType: HighlightMarkerType;
     markRuler: boolean;
     patterns: string[];
+    maxFileSize: number;
 }

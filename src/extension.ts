@@ -108,7 +108,7 @@ async function findOrCreateInstance(document: vscode.TextDocument): Promise<Docu
 
   if (!found) {
     let decorations = new DecorationOptions(config.markRuler, config.markerType);
-    const instance = new DocumentHighlight(document, decorations, config.patterns);
+    const instance = new DocumentHighlight(document, decorations, config);
     instanceMap.push(instance);
   }
 
